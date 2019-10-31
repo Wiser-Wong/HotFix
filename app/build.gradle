@@ -11,6 +11,8 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //开启分包
         multiDexEnabled true
+
+        setMultiDexKeepFile file("multiDexKeep.txt")
     }
     buildTypes {
         release {

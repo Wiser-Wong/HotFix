@@ -1,54 +1,50 @@
 package com.wiser.hotfix;
 
-import android.content.Context;
+import java.io.File;
+
+import com.wiser.hotfix.tool.AssetTools;
+import com.wiser.hotfix.tool.FileTool;
+import com.wiser.hotfix.tool.FixDexTools;
+
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.wiser.hotfix.tool.FileTool;
-
-import java.io.File;
-import java.io.IOException;
-
 public class MainActivity extends AppCompatActivity {
 
-    TextView tv;
+	TextView	tv;
 
-    String content = "666 / 0 = ";
+	String		content	= "666 / 0 = ";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+	@Override protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
 
-        tv = findViewById(R.id.tv_calculator);
-    }
+		tv = findViewById(R.id.tv_calculator);
 
-    //计算
-    public void calculator(View view) {
-        tv.setText(content + 666 / 0);
-    }
+		tv.setText(content);
+	}
 
-    //修复
-    public void fixBug(View view) {
-        tv.setText(content);
-        // 服务器下载的修复后的dex文件 这里模拟已经下载完 存在了SD卡中了
-        File sourceFile = new File(Environment.getExternalStorageDirectory(),"classes2.dex");
+	// 计算
+	public void calculator(View view) {
+		tv.setText(content + 666 / 0);
+	}
 
-        // 目标文件
-        File targetFile = new File(getDir("odex", Context.MODE_PRIVATE).getAbsolutePath() + File.separator + "classes2.dex");
+	// 修复
+	public void fixBug(View view) {
 
-        try {
-            FileTool.copyFile(sourceFile,targetFile);
+		// 模拟从服务端下载的dex文件，这里是从assets中获取文件保存到本地
+		AssetTools.copyAssetToLocalFile(this, "classes2.dex", FileTool.DEX_FILE_SAVE_PATH, "classes2.dex");
 
-            Toast.makeText(MainActivity.this,"复制完成",Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+		FixDexTools.loadFixedDex(this, new File(FileTool.DEX_FILE_SAVE_PATH));
+
+		Toast.makeText(MainActivity.this, "修复完成，必须冷启动才会生效", Toast.LENGTH_SHORT).show();
+
+	}
 
 }

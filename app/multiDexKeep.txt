@@ -1,0 +1,1 @@
+com/wiser/hotfix/HotFixApplication.class
